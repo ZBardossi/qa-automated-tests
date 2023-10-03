@@ -1,0 +1,57 @@
+﻿Function launchApp()
+	path = Environment.Value("ProductDir")
+	'msgbox path
+	InvokeApplication path+"\samples\Flights Application\FlightsGUI.exe"
+	
+If WpfWindow("Micro Focus MyFlight Sample").Exist Then
+	Reporter.ReportEvent micPass, "Launch App", "App is launched succesfully"
+Else
+	Reporter.ReportEvent micFail, "Launch App", "App launch is failed"
+End If
+End Function
+
+Function login()
+	WpfWindow("Micro Focus MyFlight Sample").WpfEdit("agentName").Set Environment("username") 
+	WpfWindow("Micro Focus MyFlight Sample").WpfEdit("password").Set Environment("pwd")
+	WpfWindow("Micro Focus MyFlight Sample").WpfButton("OK").Click
+	If WpfWindow("Micro Focus MyFlight Sample").WpfButton("FIND FLIGHTS").Exist Then
+	Reporter.ReportEvent micPass, "Login", "Login works"
+	Else
+	Reporter.ReportEvent micFail, "Login", "Login fails"
+End If
+End Function
+
+Function insertOrder()
+
+WpfWindow("Micro Focus MyFlight Sample").WpfComboBox("fromCity").Select Environment.Value("flyfrom")
+WpfWindow("Micro Focus MyFlight Sample").WpfComboBox("toCity").Select Environment.Value("flyto")
+WpfWindow("Micro Focus MyFlight Sample").WpfCalendar("datePicker").SetDate Environment.Value("date")
+WpfWindow("Micro Focus MyFlight Sample").WpfComboBox("Class").Select Environment.Value("class")
+WpfWindow("Micro Focus MyFlight Sample").WpfComboBox("numOfTickets").Select Environment.Value("numtickets")
+WpfWindow("Micro Focus MyFlight Sample").WpfButton("FIND FLIGHTS").Click
+
+WpfWindow("Micro Focus MyFlight Sample").WpfTable("flightsDataGrid").SelectCell 0,1
+WpfWindow("Micro Focus MyFlight Sample").WpfButton("SELECT FLIGHT").Click
+
+WpfWindow("Micro Focus MyFlight Sample").WpfEdit("passengerName").Set Environment.Value("passenger")
+WpfWindow("Micro Focus MyFlight Sample").WpfButton("ORDER").Click
+
+If WpfWindow("Micro Focus MyFlight Sample").WpfObject("Order *.* completed").Exist Then
+	Reporter.ReportEvent micPass, "Insert order", "Order is placed succesfully"
+Else
+	Reporter.ReportEvent micFail, "Insert order", "Order is failed"
+End If
+WpfWindow("Micro Focus MyFlight Sample").WpfButton("NEW SEARCH").Click
+End Function
+
+Function close()
+	WpfWindow("Micro Focus MyFlight Sample").Close
+	
+	If WpfWindow("Micro Focus MyFlight Sample").WpfButton("FIND FLIGHTS").Exist Then
+		Reporter.ReportEvent micFail, "Close", "Close is failed"
+	Else
+		Reporter.ReportEvent micPass, "Close", "Application is successfully closed"
+	End If
+End Function
+
+
